@@ -1,13 +1,17 @@
 import express from 'express';
 import connectionDatabase from './config/db';
 import{check,validationResult} from 'express-validator';
-
+import cors from 'cors';
 const app= express();
 //connect database
 connectionDatabase();
 
 app.use(express.json({extended: false}));
-
+app.use(
+    cors({
+        origin:'http://localhost:3000'
+    })
+);
 // Api endpoints
 /**
  * @route
@@ -46,5 +50,6 @@ app.post('/api/users',
     
     
 });
+const port=5000;
 
- app.listen(3000,() => console.log(`Express server running port on 3000`));
+ app.listen(port,() => console.log(`Express server running port ${port}`));
