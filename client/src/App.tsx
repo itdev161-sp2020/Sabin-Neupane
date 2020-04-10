@@ -18,10 +18,11 @@ class App extends React.Component{
       })
     })
     .catch((error)=> {
-console.error(`error fetching data:: ${error}`);
+console.error('error fetching data:: ${error}');
     })
   }
   render(){
+
     return (
       <Router>
         <div className="App">
@@ -50,10 +51,11 @@ console.error(`error fetching data:: ${error}`);
           </main>
         </div>
       </Router>
+
     );
   }
 }
 
 
 
-export default App;
+export default App
