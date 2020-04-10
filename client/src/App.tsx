@@ -14,14 +14,14 @@ class App extends React.Component{
       })
     })
     .catch((error)=> {
-console.error(`error fetching data:: ${error}`);
+console.error('error fetching data:: ${error}');
     })
   }
   render(){
     return(
       <div className="App">
         <header className="App-header">
-  GoodThings
+ GoodThings
         </header>
         {this.state.data}
       </div>
