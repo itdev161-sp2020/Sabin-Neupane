@@ -82,4 +82,4 @@ const Login= ({authenticateUser}) =>
     ) 
 }
 
-export default Login;
+export default Login

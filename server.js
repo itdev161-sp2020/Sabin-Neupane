@@ -6,6 +6,7 @@ import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import config from 'config';
 import User from'./models/User';
+import Post from './models/Post';
 import auth from './middleware/auth';
 
 const app= express();
@@ -76,7 +77,7 @@ async(req, res)=>{
 } catch(error){
     res.status(500).send('Server error');
 }
-    }
+}
 }
 );
 /**
@@ -91,7 +92,7 @@ app.get('/api/auth', auth, async(req,res)=>{
     }catch(error){
         res.status(500).send('Unknown server error');
 
-    }
+}
 });
 //@route Post api/login
 //@ login user
@@ -116,7 +117,7 @@ app.post(
                 if(!user){
                     return res
                     .status(400)
-                    .json({errors:[{msg: 'Invalid email or password'}]})
+                    .json({errors:[{msg: 'Invalid email or password'}]});
                 }
 
                 //check password
@@ -155,7 +156,134 @@ const returnToken = (user,res)=>{
         }
     );
 };
-    
+// post endpoint
+/**
+ * @route post api/post
+ * @desc Create post
+ */
+app.post(
+    '/api/posts',
+    [
+        auth,
+        [
+            check('title','Title text is required')
+            .not()
+            .isEmpty(),
+            check('body','body text is required')
+            .not()
+            .isEmpty()
+
+            
+        ]
+
+    ],
+    async(req,res) => {
+        const errors= validationResult(req);
+        if(!errors.isEmpty()){
+            res.status(400).json({errors:errors.array()});
+        }else{
+            const{title, body}= req.body;
+            try{
+                const user = await User.findById(req.user.id);
+
+                // create a new post
+np
+                const post= new Post({
+                    user: user.id,
+                    title: title,
+                    body: body
+                });
+                // save to the db and return
+                await post.save();
+                res.json(post);
+            }catch(error){
+                console.error(error);
+                res.status(500).send('Server error');
+            }
+        }
+        
+        
+    }
+);
+ /**
+  * @route GET api/posts
+  * @desc Get posts
+  */   
+ app.get('/api/posts', auth,async(req,res)=>{
+     try{
+         const posts =await Post.find().sort({date:-1});
+
+         res.json(posts);
+
+     }catch(error){
+         console.error(error);
+         res.status(500).send('Server error')
+     }
+ });
+ /**
+  * @route GET api/posts/:id
+  * @desc GET post
+  */
+ app.get('/api/posts/:id', auth,async(req,res)=>{
+     try{
+         const post= await Post.findById(req.params.id);
+
+         if(!post){
+             return res.status(404).json({msg: 'Post not found'});
+
+         }
+         res.json(post);
+     }catch(error){
+         console.error(error);
+         res.status(500).send('server error');
+     }
+ });
+ /**
+  * 
+  */
+app.delete('/api/posts/:id', auth, async (req,res)=>{
+    try{
+const post= await Post.findById(req.params.id);
+if(!post){
+    return res.status(404).json({msg:'post not found'});
+}
+if(post.user.toString()!==req.user.id){
+    return res.status(401).json({msg:'user not authorized'});
+}
+await post.remove();
+res.json({msg:'post Removed'});
+
+    }catch(error){
+
+        console.error(error);
+        res.status(500).send('server error');
+    }
+});
+
+
+app.put('/api/posts/:id', auth, async (req, res)=> {
+    try{
+        const{title, body}= req.body;
+        const post= await Post.findById(req.params.id);
+        if(!post){
+            return res.status(404).json({msg: 'Post not found'});
+        }
+
+        if(post.user.toString()!== req.user.id){
+            return res.status(401).json({ msg: 'user not authorized' });
+        }
+        post.title = title || post.title;
+        post.body= body || post.body;
+        
+        await post.save();
+        res.json(post);
+
+    } catch (error) {
+
+        console.error(error);
+        res.status(500).send('server error');
+    }
+});
 
 
 const port = 5000;
