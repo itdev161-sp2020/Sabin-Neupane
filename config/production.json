@@ -1,0 +1,5 @@
+{
+    "mongoURL": "mongodb+srv://Sabin-Neupane:sabin123@cluster0-tgmco.mongodb.net/test?retryWrites=true&w=majority",
+
+    "jwtSecret": "maytheforcebewithyoy"
+}
